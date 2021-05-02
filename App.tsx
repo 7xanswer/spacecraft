@@ -1,21 +1,66 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, StatusBar, View, FlatList, ScrollView } from 'react-native';
+import { Avatar, Card, Title } from 'react-native-paper';
+import { data } from './data';
+import Offline from './Offline';
+import AppLayout from './AppLayout';
+import { QueryClient, QueryClientProvider } from 'react-query'
 
-export default function App() {
+const queryClient = new QueryClient()
+
+const App = () => {
+  const renderItem = ({ item }) => (
+    <Item name={item.name} model={item.model} crew={item.crew} />
+  );
+  
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <AppLayout title="Starships">
+        <SafeAreaView style={styles.container}>
+          <ScrollView>
+            <View>
+              <FlatList
+                data={data.results}
+                renderItem={renderItem}
+              />
+            </View>
+            <Offline></Offline>
+          </ScrollView>
+        </SafeAreaView>
+      </AppLayout>
+    </QueryClientProvider>
   );
 }
 
+const Item = ({ name, model, crew }) => {
+  return (
+    <Card>
+      <Card.Title 
+      title={name}
+      left={(props) => <Avatar.Icon {...props} icon="ship-wheel" />}
+      />
+      <Card.Content>
+        <Title>Model</Title>
+        <Text>{model}</Text>
+        <Title>Crew</Title>
+        <Text>{crew}</Text>
+      </Card.Content>
+    </Card>
+  )
+}
+
 const styles = StyleSheet.create({
-  container: {
+  safeContainer: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: StatusBar.currentHeight || 0,
+  },
+  container: {
+    marginVertical: 40,
+  },
+  item: {
+    marginVertical: 8,
+    marginHorizontal: 16,
   },
 });
+
+export default App;
